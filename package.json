@@ -1,5 +1,5 @@
 {
-  "name": "ignitor.create-composed-event-handler",
+  "name": "ignitor.create-forwardedrefs",
   "version": "0.0.0",
   "type": "module",
   "description": "an event utils for combine react event",
@@ -7,7 +7,7 @@
     "test": "vitest",
     "dev": "tsup --watch",
     "build": "tsup",
-    "prepublish": "npm run build"
+    "prepublish": "npm run test && npm run build"
   },
   "files": [
     "dist",
