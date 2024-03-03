@@ -1,13 +1,18 @@
 {
   "name": "ignitor.create-forwardedrefs",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
-  "description": "an event utils for combine react event",
+  "description": "an utils for composed new react forwarded refs component",
   "scripts": {
     "test": "vitest",
     "dev": "tsup --watch",
     "build": "tsup",
     "prepublish": "npm run test && npm run build"
+  },
+  "homepage": "https://github.com/ignitorscript/ignitor.create-forwardref",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ignitorscript/ignitor.create-forwardref.git"
   },
   "files": [
     "dist",
