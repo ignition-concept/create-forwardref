@@ -4,19 +4,22 @@
 
 ```bash
 # for npm
-npm i ignitor.create-forwardedrefs
+npm i @ignition-concept/create-forwardref
 
 # for yarn
-yarn add ignitor.create-forwardedrefs
+yarn add @ignition-concept/create-forwardref
 
 # for pnpm
-pnpm install ignitor.create-forwardedrefs
+pnpm install @ignition-concept/create-forwardref
 ```
 
 ## Usage
 
 ```tsx
-import { createForwardRef, PropTypes } from "ignitor.create-forwardedrefs";
+import {
+  createForwardRef,
+  PropTypes,
+} from "@ignition-concept/create-forwardref";
 
 export const Component = createForwardRef("div", (props, ref) => {
   return <div {...props} ref={ref} />;
