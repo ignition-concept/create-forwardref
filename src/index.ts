@@ -98,7 +98,11 @@ export function staled__createForwardRef<
       : typeof tag === "string"
       ? `_forwarded(${tag})`
       : `_forwarded(${
-          typeof tag.displayName === "undefined" ? tag.name : tag.displayName
+          typeof tag.displayName === "undefined"
+            ? tag.name
+            : tag.displayName.includes("_forwarded(")
+            ? tag.displayName.replace(/^_forwarded\(/s, "").replace(/\)$/s, "")
+            : tag.displayName
         })`,
   };
 

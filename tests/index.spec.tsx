@@ -173,7 +173,7 @@ describe("that how the new implement", () => {
 
     expect(display).toBeTruthy();
     expect(display).toBeInTheDocument();
-    expect(Component.displayName).toBe(`_forwarded(_forwarded(BaseComponent))`);
+    expect(Component.displayName).toBe(`_forwarded(BaseComponent)`);
     expect(Component.defaultProps).toStrictEqual({});
     expect(Component.propTypes).toStrictEqual({});
   });
