@@ -16,7 +16,7 @@ pnpm install ignitor.create-forwardedrefs
 ## Usage
 
 ```tsx
-import { createForwardRef } from "ignitor.create-forwardedrefs";
+import { createForwardRef, PropTypes } from "ignitor.create-forwardedrefs";
 
 export const Component = createForwardRef("div", (props, ref) => {
   return <div {...props} ref={ref} />;
@@ -32,21 +32,30 @@ export const ForwardedExactComponent = createForwardRef(
   (props, ref) => {
     return <Component {...props} ref={ref} />;
   },
-  "YourExactNameGoesHere"
+  {
+    displayName: "YourExactNameGoesHere",
+  }
 );
 
 // or you waant to extends props over the component
-export const ForwardedComponentNext = createForwardRef<{ yourProps?: boolean }>(
+export const ForwardedComponentNext = createForwardRef(
   Component,
   ({ yourProps, ...props }, ref) => {
     const test = doingWithYourProps(yourProps); // something like that
 
     return <Component {...props} ref={ref} />;
   },
-  "YourExactNameGoesHere"
+  {
+    propTypes: {
+      yourProps: PropTypes.bool,
+    },
+    displayName: "YourExactNameGoesHereNext",
+  }
 );
 ```
 
 ## Features
 
-- nothing just it more convenient for using
+- it can forward other component
+- it has validation and its validate props by using `prop-types`
+- it has already export what need to using with `react`

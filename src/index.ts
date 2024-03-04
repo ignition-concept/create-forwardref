@@ -2,7 +2,10 @@ import React from "react";
 
 export * as PropType from "prop-types";
 
-export function createForwardRef<
+/**
+ * @deprecated seem it has little functionality and not so convenient for using
+ */
+export function deprecate_createForwardRef<
   TProps extends Record<never, never>,
   TTag extends
     | keyof React.JSX.IntrinsicElements
@@ -17,8 +20,14 @@ export function createForwardRef<
   exactName: string | undefined = undefined
 ) {
   console.log(
-    "`exactName` argument soon maybe next minor version is going to remove around",
-    "`0.2.0`"
+    "this function soon maybe next minor version is going to remove around",
+    "`0.2.0`",
+    "and this creation is deprecated"
+  );
+
+  console.log(
+    "this function is going to deleted soon i give you until Wednesday April 3 2024",
+    "i will update to 0.2.0 any breaking changes i do not warrent by any means so i warn you from today"
   );
 
   const Forwarded = React.forwardRef(render);
@@ -54,6 +63,7 @@ interface OverrideForwardRef<TSchema extends Record<never, never>> {
    * @see {@link https://github.com/facebook/react/pull/16210}
    */
   defaultProps?: PropType.InferProps<TSchema>;
+  supressWarning?: boolean;
 }
 
 /**
@@ -61,12 +71,11 @@ interface OverrideForwardRef<TSchema extends Record<never, never>> {
  *
  * still implement but i prefer you using the old one with caution
  */
-export function unsafe_createForwardRef<
+export function staled__createForwardRef<
   TTag extends
     | keyof React.JSX.IntrinsicElements
     | React.ForwardRefExoticComponent<any>
-    | (new (props: any) => React.Component<any, {}, any>)
-    | ((props: any, context?: any) => React.ReactNode),
+    | React.ComponentType<any>,
   TSchema extends Record<never, never>
 >(
   tag: TTag,
@@ -78,13 +87,19 @@ export function unsafe_createForwardRef<
     > &
       PropType.InferProps<TSchema>
   >,
-  override: OverrideForwardRef<TSchema>
+  override: OverrideForwardRef<TSchema> = {}
 ) {
   const defaultOverride = {
-    ...override,
+    defaultProps: override.defaultProps ? { ...override.defaultProps } : {},
+    propTypes: override.propTypes ? { ...override.propTypes } : {},
+    supressWarning: override.supressWarning ?? true,
     displayName: override.displayName
-      ? override.displayName
-      : `_forwarded(${tag})`,
+      ? `_forwarded(${override.displayName})`
+      : typeof tag === "string"
+      ? `_forwarded(${tag})`
+      : `_forwarded(${
+          typeof tag.displayName === "undefined" ? tag.name : tag.displayName
+        })`,
   };
 
   const Forwarded = React.forwardRef(render);
@@ -92,9 +107,11 @@ export function unsafe_createForwardRef<
   Forwarded.displayName = defaultOverride.displayName;
 
   if (defaultOverride.defaultProps) {
-    console.log(
-      "Warn: for functional components please remove it from your component if you using class Component just ignore"
-    );
+    if (defaultOverride.supressWarning === false) {
+      console.log(
+        "Warn: for functional components please remove it from your component if you using class Component just ignore"
+      );
+    }
 
     Forwarded.defaultProps =
       defaultOverride.defaultProps as unknown as typeof Forwarded.defaultProps;
@@ -106,3 +123,5 @@ export function unsafe_createForwardRef<
 
   return Forwarded;
 }
+
+export { deprecate_createForwardRef as createForwardRef };
