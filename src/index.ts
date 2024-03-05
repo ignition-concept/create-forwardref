@@ -1,5 +1,6 @@
 import React from "react";
 
+import type { InferProps } from "prop-types";
 export * as PropType from "prop-types";
 
 /**
@@ -51,8 +52,6 @@ export function deprecate_createForwardRef<
   return Forwarded;
 }
 
-import PropType from "prop-types";
-
 interface OverrideForwardRef<TSchema extends Record<never, never>> {
   propTypes?: TSchema;
   displayName?: string;
@@ -62,7 +61,7 @@ interface OverrideForwardRef<TSchema extends Record<never, never>> {
    *
    * @see {@link https://github.com/facebook/react/pull/16210}
    */
-  defaultProps?: PropType.InferProps<TSchema>;
+  defaultProps?: InferProps<TSchema>;
   supressWarning?: boolean;
 }
 
@@ -81,11 +80,8 @@ export function staled__createForwardRef<
   tag: TTag,
   render: React.ForwardRefRenderFunction<
     React.ElementRef<TTag>,
-    Omit<
-      React.ComponentPropsWithoutRef<TTag>,
-      keyof PropType.InferProps<TSchema>
-    > &
-      PropType.InferProps<TSchema>
+    Omit<React.ComponentPropsWithoutRef<TTag>, keyof InferProps<TSchema>> &
+      InferProps<TSchema>
   >,
   override: OverrideForwardRef<TSchema> = {}
 ) {
