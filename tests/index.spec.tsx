@@ -1,9 +1,9 @@
-import { staled__createForwardRef, PropType } from "../src";
+import { createForwardRef, PropType } from "../src";
 import { render } from "@testing-library/react";
 
 describe("that how the new implement", () => {
   it("should using with only tag string", async () => {
-    const Component = staled__createForwardRef("div", (props, ref) => {
+    const Component = createForwardRef("div", (props, ref) => {
       return <div {...props} ref={ref} data-testid="display" />;
     });
 
@@ -19,7 +19,7 @@ describe("that how the new implement", () => {
   });
 
   it("should using with only tag string and some custom props using propTypes", async () => {
-    const Component = staled__createForwardRef(
+    const Component = createForwardRef(
       "div",
       ({ connection, ...props }, ref) => {
         return (
@@ -52,7 +52,7 @@ describe("that how the new implement", () => {
   });
 
   it("should using with only tag string and some custom props using propTypes and custom injection", async () => {
-    const Component = staled__createForwardRef(
+    const Component = createForwardRef(
       "div",
       ({ connection, ...props }, ref) => {
         return (
@@ -91,7 +91,7 @@ describe("that how the new implement", () => {
   });
 
   it("should using with only tag string and some custom props using propTypes and custom injection", async () => {
-    const Component = staled__createForwardRef(
+    const Component = createForwardRef(
       "div",
       ({ connection, ...props }, ref) => {
         return (
@@ -137,7 +137,7 @@ describe("that how the new implement", () => {
       return <div {...props} />;
     };
 
-    const Component = staled__createForwardRef(BaseComponent, (props, ref) => {
+    const Component = createForwardRef(BaseComponent, (props, ref) => {
       return <BaseComponent {...props} ref={ref} data-testid="display" />;
     });
 
@@ -153,7 +153,7 @@ describe("that how the new implement", () => {
   });
 
   it("should working with other forwarded ref", async () => {
-    const BaseComponent = staled__createForwardRef(
+    const BaseComponent = createForwardRef(
       "div",
       (props, ref) => {
         return <div {...props} ref={ref} data-testid="display" />;
@@ -163,7 +163,7 @@ describe("that how the new implement", () => {
       }
     );
 
-    const Component = staled__createForwardRef(BaseComponent, (props, ref) => {
+    const Component = createForwardRef(BaseComponent, (props, ref) => {
       return <BaseComponent {...props} ref={ref} />;
     });
 
