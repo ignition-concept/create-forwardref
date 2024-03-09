@@ -3,55 +3,6 @@ import React from "react";
 import type { InferProps } from "prop-types";
 export * as PropType from "prop-types";
 
-/**
- * @deprecated seem it has little functionality and not so convenient for using
- */
-export function deprecate_createForwardRef<
-  TProps extends Record<never, never>,
-  TTag extends
-    | keyof React.JSX.IntrinsicElements
-    | React.ForwardRefExoticComponent<any>
-    | React.ComponentType<any>
->(
-  tag: TTag,
-  render: React.ForwardRefRenderFunction<
-    React.ElementRef<TTag>,
-    Omit<React.ComponentPropsWithoutRef<TTag>, keyof TProps> & TProps
-  >,
-  exactName: string | undefined = undefined
-) {
-  console.log(
-    "this function soon maybe next minor version is going to remove around",
-    "`0.2.0`",
-    "and this creation is deprecated"
-  );
-
-  console.log(
-    "this function is going to deleted soon i give you until Wednesday April 3 2024",
-    "i will update to 0.2.0 any breaking changes i do not warrent by any means so i warn you from today"
-  );
-
-  const Forwarded = React.forwardRef(render);
-
-  if (exactName) {
-    Forwarded.displayName = exactName;
-
-    return Forwarded;
-  }
-
-  if (typeof tag === "function") {
-    Forwarded.displayName = `ignitorForwardedComponent(${tag.displayName})`;
-
-    return Forwarded;
-  }
-
-  Forwarded.displayName = `ignitorForwardedTag(${
-    tag as keyof React.JSX.IntrinsicElements
-  })`;
-
-  return Forwarded;
-}
-
 interface OverrideForwardRef<TSchema extends Record<never, never>> {
   propTypes?: TSchema;
   displayName?: string;
@@ -67,10 +18,11 @@ interface OverrideForwardRef<TSchema extends Record<never, never>> {
 
 /**
  * @description
+ *  **Note**: please use `ref` prop from component if you using react 19
  *
  * still implement but i prefer you using the old one with caution
  */
-export function staled__createForwardRef<
+export function createForwardRef<
   TTag extends
     | keyof React.JSX.IntrinsicElements
     | React.ForwardRefExoticComponent<any>
@@ -123,5 +75,3 @@ export function staled__createForwardRef<
 
   return Forwarded;
 }
-
-export { deprecate_createForwardRef as createForwardRef };
