@@ -62,3 +62,5 @@ export const ForwardedComponentNext = createForwardRef(
 - it can forward other component
 - it has validation and its validate props by using `prop-types`
 - it has already export what need to using with `react`
+
+> **Note**: if you using react@19 please using new react api.
