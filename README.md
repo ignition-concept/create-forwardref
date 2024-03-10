@@ -63,4 +63,14 @@ export const ForwardedComponentNext = createForwardRef(
 - it has validation and its validate props by using `prop-types`
 - it has already export what need to using with `react`
 
-> **Note**: if you using react@19 please using new react api.
+**Note**: if you using react@19 please using new react api.
+
+**Note**: if you get message when you using pnpm:
+
+> The inferred type of '(something)' cannot be named without a reference to '(location)'. This is likely not portable. A type annotation is necessary.
+
+do this following:
+
+1.  create `.npmrc` at root folder
+2.  copy this `node-linker=hoisted` in rcfile
+3.  and run `pnpm install` again and done.
