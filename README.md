@@ -20,39 +20,51 @@ import {
   createForwardRef,
   PropTypes,
 } from "@ignition-concept/create-forwardref";
+import { useId } from "react";
 
-export const Component = createForwardRef("div", (props, ref) => {
-  return <div {...props} ref={ref} />;
+function OtherComponent({ title }) {
+  return <div>{title}</div>;
+}
+
+const Button = createForwardRef("button", function (props, ref) {
+  return <button {...props} ref={ref} />;
 });
 
-export const ForwardedComponent = createForwardRef(Component, (props, ref) => {
-  return <Component {...props} ref={ref} />;
-});
+const ExtendsOtherComponent = createForwardRef(
+  OtherComponent,
+  function ({ title }) {
+    const id = useId();
+    const $title = `${title}_id-${id}`;
 
-// or you want exact name for component
-export const ForwardedExactComponent = createForwardRef(
-  Component,
-  (props, ref) => {
-    return <Component {...props} ref={ref} />;
-  },
-  {
-    displayName: "YourExactNameGoesHere",
+    return <OtherComponent title={$title} />;
   }
 );
 
-// or you waant to extends props over the component
-export const ForwardedComponentNext = createForwardRef(
-  Component,
-  ({ yourProps, ...props }, ref) => {
-    const test = doingWithYourProps(yourProps); // something like that
-
-    return <Component {...props} ref={ref} />;
-  },
+const AdvancePropTypesButton = createForwardRef(
   {
+    tag: "button",
     propTypes: {
-      yourProps: PropTypes.bool,
+      trigger: PropTypes.bool,
     },
-    displayName: "YourExactNameGoesHereNext",
+    defaultProps: {
+      trigger: false,
+    },
+    displayName: "TriggerButton",
+  },
+  function ({ trigger, ...props }, ref) {
+    return (
+      <button
+        {...props}
+        onClick={function (event) {
+          if (trigger) {
+            console.log("trigger has start");
+          }
+          props.onClick?.(event);
+        }}
+        ref={ref}
+        data-trigger={trigger}
+      />
+    );
   }
 );
 ```
@@ -74,3 +86,5 @@ do this following:
 1.  create `.npmrc` at root folder
 2.  copy this `node-linker=hoisted` in rcfile
 3.  and run `pnpm install` again and done.
+
+**warn**: The Package Is Not For Using Outside of `Ignition-Concept` any change may not be notice.

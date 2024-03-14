@@ -1,180 +1,191 @@
-import { createForwardRef, PropType } from "../src";
-import { render } from "@testing-library/react";
+import { createForwardRef, PropTypes } from "../src";
+import { act, render, screen } from "@testing-library/react";
 
 describe("that how the new implement", () => {
-  it("should using with only tag string", async () => {
-    const Component = createForwardRef("div", (props, ref) => {
-      return <div {...props} ref={ref} data-testid="display" />;
-    });
+  const TEXT_CONTENT = "Hello World";
 
-    const screen = render(<Component />);
+  const logger = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
-    const display = await screen.findByTestId("display");
-
-    expect(display).toBeTruthy();
-    expect(display).toBeInTheDocument();
-    expect(Component.displayName).toBe(`_forwarded(div)`);
-    expect(Component.defaultProps).toStrictEqual({});
-    expect(Component.propTypes).toStrictEqual({});
+  afterEach(() => {
+    logger.mockReset();
   });
 
-  it("should using with only tag string and some custom props using propTypes", async () => {
-    const Component = createForwardRef(
-      "div",
-      ({ connection, ...props }, ref) => {
-        return (
-          <div
-            {...props}
-            ref={ref}
-            data-connection={connection}
-            data-testid="display"
-          />
-        );
-      },
-      {
-        propTypes: {
-          connection: PropType.string.isRequired,
-        },
-      }
-    );
-
-    const screen = render(<Component connection="http://localhost:12345" />);
-
-    const display = await screen.findByTestId("display");
-
-    expect(display).toBeTruthy();
-    expect(display).toBeInTheDocument();
-    expect(Component.displayName).toBe(`_forwarded(div)`);
-    expect(Component.defaultProps).toStrictEqual({});
-    expect(Component.propTypes).toStrictEqual({
-      connection: PropType.string.isRequired,
+  it("can be pass string tag", async () => {
+    const Button = createForwardRef("button", (props, ref) => {
+      return (
+        <button
+          {...props}
+          onClick={(evt) => {
+            console.log("hello world");
+            props.onClick?.(evt);
+          }}
+          ref={ref}
+        />
+      );
     });
+
+    render(<Button data-testid="button">{TEXT_CONTENT}</Button>);
+
+    const button = await screen.findByTestId<HTMLButtonElement>("button");
+
+    act(() => {
+      button.click();
+    });
+
+    expect(logger).toHaveBeenCalledOnce();
+    expect(button).toBeInTheDocument();
+    expect(button.textContent).toBe(TEXT_CONTENT);
   });
 
-  it("should using with only tag string and some custom props using propTypes and custom injection", async () => {
-    const Component = createForwardRef(
-      "div",
-      ({ connection, ...props }, ref) => {
-        return (
-          <div
-            {...props}
-            ref={ref}
-            data-connection={connection}
-            data-testid="display"
-          />
-        );
-      },
-      {
-        propTypes: {
-          connection: PropType.string,
-        },
-        defaultProps: {
-          connection: "http://localhost:12345",
-        },
-      }
-    );
-
-    const screen = render(<Component connection="http://localhost:123456" />);
-
-    const display = await screen.findByTestId("display");
-
-    expect(display.dataset.connection).toBe("http://localhost:123456");
-    expect(display).toBeTruthy();
-    expect(display).toBeInTheDocument();
-    expect(Component.displayName).toBe(`_forwarded(div)`);
-    expect(Component.defaultProps).toStrictEqual({
-      connection: "http://localhost:12345",
-    });
-    expect(Component.propTypes).toStrictEqual({
-      connection: PropType.string,
-    });
-  });
-
-  it("should using with only tag string and some custom props using propTypes and custom injection", async () => {
-    const Component = createForwardRef(
-      "div",
-      ({ connection, ...props }, ref) => {
-        return (
-          <div
-            {...props}
-            ref={ref}
-            data-connection={connection}
-            data-testid="display"
-          />
-        );
-      },
-      {
-        propTypes: {
-          connection: PropType.string,
-        },
-        defaultProps: {
-          connection: "http://localhost:12345",
-        },
-        displayName: "Component",
-      }
-    );
-
-    const screen = render(<Component connection="http://localhost:123456" />);
-
-    const display = await screen.findByTestId("display");
-
-    expect(display.dataset.connection).toBe("http://localhost:123456");
-    expect(display).toBeTruthy();
-    expect(display).toBeInTheDocument();
-    expect(Component.displayName).toBe(`_forwarded(Component)`);
-    expect(Component.defaultProps).toStrictEqual({
-      connection: "http://localhost:12345",
-    });
-    expect(Component.propTypes).toStrictEqual({
-      connection: PropType.string,
-    });
-  });
-
-  it("should extract from other component", async () => {
-    const BaseComponent: React.FC<React.ComponentPropsWithRef<"div">> = (
-      props
-    ) => {
-      return <div {...props} />;
+  it("can be pass Function/Classes tag", async () => {
+    const Test: React.ComponentType<{
+      title: string;
+      ref?: React.Ref<HTMLDivElement>;
+    }> = ({ title, ref }) => {
+      return (
+        <h1 ref={ref} data-testid="h1">
+          {title}
+        </h1>
+      );
     };
 
-    const Component = createForwardRef(BaseComponent, (props, ref) => {
-      return <BaseComponent {...props} ref={ref} data-testid="display" />;
+    const ForwardedTest = createForwardRef(Test, (props, ref) => {
+      return <Test {...props} ref={ref} />;
     });
 
-    const screen = render(<Component />);
+    render(<ForwardedTest title={TEXT_CONTENT} />);
 
-    const display = await screen.findByTestId("display");
+    const h1 = await screen.findByTestId<HTMLHeadElement>("h1");
 
-    expect(display).toBeTruthy();
-    expect(display).toBeInTheDocument();
-    expect(Component.displayName).toBe(`_forwarded(BaseComponent)`);
-    expect(Component.defaultProps).toStrictEqual({});
-    expect(Component.propTypes).toStrictEqual({});
+    expect(h1.textContent).toBe(TEXT_CONTENT);
   });
 
-  it("should working with other forwarded ref", async () => {
-    const BaseComponent = createForwardRef(
-      "div",
-      (props, ref) => {
-        return <div {...props} ref={ref} data-testid="display" />;
-      },
+  it("can be pass advance option `prop-types`", async () => {
+    const Button = createForwardRef(
       {
-        displayName: "BaseComponent",
+        tag: "button",
+        propTypes: {
+          trigger: PropTypes.bool.isRequired,
+        },
+      },
+      ({ trigger, ...props }, ref) => {
+        return (
+          <button
+            {...props}
+            onClick={(evt) => {
+              if (trigger) {
+                console.log("hello world 2");
+              }
+              props.onClick?.(evt);
+            }}
+            ref={ref}
+            data-trigger-element={trigger}
+          />
+        );
       }
     );
 
-    const Component = createForwardRef(BaseComponent, (props, ref) => {
-      return <BaseComponent {...props} ref={ref} />;
+    render(
+      <Button data-testid="button" trigger>
+        {TEXT_CONTENT}
+      </Button>
+    );
+
+    const button = await screen.findByTestId("button");
+
+    act(() => {
+      button.click();
     });
 
-    const screen = render(<Component />);
+    expect(logger).toHaveBeenCalledOnce();
+    expect(button).toBeInTheDocument();
+    expect(button.textContent).toBe(TEXT_CONTENT);
+    expect("propTypes" in Button).toBeTruthy();
+    expect(Button.propTypes).toStrictEqual({
+      trigger: PropTypes.bool.isRequired,
+    });
+  });
 
-    const display = await screen.findByTestId("display");
+  it("can be pass advance option `displayName`", async () => {
+    const Button = createForwardRef(
+      {
+        tag: "button",
+        displayName: "ButtonNext",
+      },
+      (props, ref) => {
+        return (
+          <button
+            {...props}
+            onClick={(evt) => {
+              console.log("hello world 3");
+              props.onClick?.(evt);
+            }}
+            ref={ref}
+          />
+        );
+      }
+    );
 
-    expect(display).toBeTruthy();
-    expect(display).toBeInTheDocument();
-    expect(Component.displayName).toBe(`_forwarded(BaseComponent)`);
-    expect(Component.defaultProps).toStrictEqual({});
-    expect(Component.propTypes).toStrictEqual({});
+    render(<Button data-testid="button">{TEXT_CONTENT}</Button>);
+
+    const button = await screen.findByTestId("button");
+
+    act(() => {
+      button.click();
+    });
+
+    expect(logger).toHaveBeenCalledOnce();
+    expect(button).toBeInTheDocument();
+    expect(button.textContent).toBe(TEXT_CONTENT);
+    expect("displayName" in Button).toBeTruthy();
+    expect(Button.displayName).toBe("ButtonNext");
+  });
+
+  it("can be pass advance option `defaultProps`", async () => {
+    const Button = createForwardRef(
+      {
+        tag: "button",
+        propTypes: {
+          trigger: PropTypes.bool,
+        },
+        defaultProps: {
+          trigger: true,
+        },
+      },
+      ({ trigger, ...props }, ref) => {
+        return (
+          <button
+            {...props}
+            onClick={(evt) => {
+              if (trigger) {
+                console.log("hello world 4");
+              }
+              props.onClick?.(evt);
+            }}
+            ref={ref}
+          />
+        );
+      }
+    );
+
+    render(<Button data-testid="button">{TEXT_CONTENT}</Button>);
+
+    const button = await screen.findByTestId("button");
+
+    act(() => {
+      button.click();
+    });
+
+    expect(logger).toHaveBeenCalledOnce();
+    expect(button).toBeInTheDocument();
+    expect(button.textContent).toBe(TEXT_CONTENT);
+    expect("propTypes" in Button).toBeTruthy();
+    expect(Button.propTypes).toStrictEqual({
+      trigger: PropTypes.bool,
+    });
+    expect("defaultProps" in Button).toBeTruthy();
+    expect(Button.defaultProps).toStrictEqual({
+      trigger: true,
+    });
   });
 });

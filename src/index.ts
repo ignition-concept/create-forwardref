@@ -1,77 +1,64 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-import type { InferProps } from "prop-types";
-export * as PropType from "prop-types";
-
-interface OverrideForwardRef<TSchema extends Record<never, never>> {
-  propTypes?: TSchema;
-  displayName?: string;
-  /**
-   * @danger for functional component users
-   * @warning for class component users
-   *
-   * @see {@link https://github.com/facebook/react/pull/16210}
-   */
-  defaultProps?: InferProps<TSchema>;
-  supressWarning?: boolean;
-}
+export { PropTypes };
 
 /**
- * @description
- *  **Note**: please use `ref` prop from component if you using react 19
- *
- * still implement but i prefer you using the old one with caution
+ * just hack around
  */
-export function createForwardRef<
-  TTag extends
-    | keyof React.JSX.IntrinsicElements
-    | React.ForwardRefExoticComponent<any>
-    | React.ComponentType<any>,
-  TSchema extends Record<never, never>
->(
-  tag: TTag,
+const override = <T>(item: any): T => item;
+
+type Tag =
+  | keyof React.JSX.IntrinsicElements
+  | React.ForwardRefExoticComponent<any>
+  | (new (props: any) => React.Component<any, {}, any>)
+  | ((props: any, context?: any) => React.ReactNode);
+
+interface Component<TPropTypes, TTag extends Tag> {
+  propTypes?: TPropTypes;
+  defaultProps?: PropTypes.InferProps<TPropTypes>;
+  displayName?: string;
+  tag: TTag;
+}
+
+export function createForwardRef<TTag extends Tag, TPropTypes>(
+  component: Component<TPropTypes, TTag> | TTag,
   render: React.ForwardRefRenderFunction<
     React.ElementRef<TTag>,
-    Omit<React.ComponentPropsWithoutRef<TTag>, keyof InferProps<TSchema>> &
-      InferProps<TSchema>
-  >,
-  override: OverrideForwardRef<TSchema> = {}
+    React.ComponentPropsWithoutRef<TTag> & PropTypes.InferProps<TPropTypes>
+  >
 ) {
-  const defaultOverride = {
-    defaultProps: override.defaultProps ? { ...override.defaultProps } : {},
-    propTypes: override.propTypes ? { ...override.propTypes } : {},
-    supressWarning: override.supressWarning ?? true,
-    displayName: override.displayName
-      ? `_forwarded(${override.displayName})`
-      : typeof tag === "string"
-      ? `_forwarded(${tag})`
-      : `_forwarded(${
-          typeof tag.displayName === "undefined"
-            ? tag.name
-            : tag.displayName.includes("_forwarded(")
-            ? tag.displayName.replace(/^_forwarded\(/s, "").replace(/\)$/s, "")
-            : tag.displayName
-        })`,
-  };
-
   const Forwarded = React.forwardRef(render);
 
-  Forwarded.displayName = defaultOverride.displayName;
+  if (typeof component === "string") {
+    Forwarded.displayName = component;
 
-  if (defaultOverride.defaultProps) {
-    if (defaultOverride.supressWarning === false) {
-      console.log(
-        "Warn: for functional components please remove it from your component if you using class Component just ignore"
-      );
-    }
-
-    Forwarded.defaultProps =
-      defaultOverride.defaultProps as unknown as typeof Forwarded.defaultProps;
+    return Forwarded;
   }
 
-  if (defaultOverride.propTypes) {
-    Forwarded.propTypes = defaultOverride.propTypes;
+  if (typeof component === "function") {
+    Forwarded.displayName = component.name;
+
+    return Forwarded;
+  }
+
+  if (component.displayName) {
+    Forwarded.displayName = component.displayName;
+  }
+
+  if (component.defaultProps) {
+    Forwarded.defaultProps = override<typeof Forwarded.defaultProps>(
+      component.defaultProps
+    );
+  }
+
+  if (component.propTypes) {
+    Forwarded.propTypes = override<typeof Forwarded.propTypes>(
+      component.propTypes
+    );
   }
 
   return Forwarded;
 }
+
+export default createForwardRef;
