@@ -1,6 +1,6 @@
 {
   "name": "@ignition-concept/create-forwardref",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "type": "module",
   "description": "an utils for composed new react forwarded refs component (move from 'ignitor.create-forwardedrefs')",
   "scripts": {
@@ -15,7 +15,7 @@
     "url": "https://github.com/ignition-concept/create-forwardref.git"
   },
   "types": "./dist/index.d.ts",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "files": [
     "dist",
