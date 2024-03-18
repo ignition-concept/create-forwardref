@@ -4,7 +4,9 @@ import { act, render, screen } from "@testing-library/react";
 describe("that how the new implement", () => {
   const TEXT_CONTENT = "Hello World";
 
-  const logger = vi.spyOn(console, "log").mockImplementation(() => undefined);
+  const logger = vi
+    .spyOn(console, "log")
+    .mockImplementation((message, ...args) => undefined);
 
   afterEach(() => {
     logger.mockReset();
@@ -187,5 +189,37 @@ describe("that how the new implement", () => {
     expect(Button.defaultProps).toStrictEqual({
       trigger: true,
     });
+  });
+
+  it("can pass advance `excludeProps`", async () => {
+    createForwardRef(
+      {
+        tag: "button",
+        propTypes: {
+          trigger: PropTypes.bool,
+        },
+        defaultProps: {
+          trigger: true,
+        },
+        excludeProps: {
+          onClick: PropTypes.func,
+        },
+      },
+      ({ trigger, ...props }, ref) => {
+        return (
+          <button
+            {...props}
+            onClick={() => {
+              if (trigger) {
+                console.log("hello world 5");
+              }
+            }}
+            ref={ref}
+          />
+        );
+      }
+    );
+
+    console.log("this property just for types not for checking");
   });
 });
